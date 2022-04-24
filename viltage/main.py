@@ -28,8 +28,10 @@ def reader_url_saved_text(url):
 #reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
 # Вводим адрес и созраняем в фалйе через функцию
 url_detali = input("Введите адрес страница с сата voltag.ru")
-if len(url_detali) > 20:
+if len(url_detali) > 20 and url_detali.find("https://voltag.ru") == 0:
     reader_url_saved_text(url_detali)
+else:
+    print("Проверьте адрес. ")
 
 # Чтение из файла и преобразовываем с soup
 def read_text():
