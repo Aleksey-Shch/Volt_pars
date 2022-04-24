@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import openpyxl
 
+
 # # чтение данных с сайта и сохранение в файле
 # def reader_url_saved_text(url):
 #     try:

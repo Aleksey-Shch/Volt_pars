@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 import requests
 import re
 
+
 model = 'ALA0236'
 # чтение данных с сайта и сохранение в файле
 def reader_url_saved_text(url, kol):
