@@ -25,9 +25,11 @@ def reader_url_saved_text(url):
         print(f"Ошибка при сохранении файла")
 
 # reader_url_saved_text("https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236")
-reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
-
-#Запись в файл
+#reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
+# Вводим адрес и созраняем в фалйе через функцию
+url_detali = input("Введите адрес страница с сата voltag.ru")
+if len(url_detali) > 20:
+    reader_url_saved_text(url_detali)
 
 # Чтение из файла и преобразовываем с soup
 def read_text():
@@ -112,8 +114,8 @@ try:
     excel_sheet.column_dimensions["G"].width = 5
     excel_sheet.column_dimensions["H"].width = 5
     excel_sheet.column_dimensions["I"].width = 50
-    # Запись сроссов в файл
 
+    # Запись сроссов в файл
     excel_sheet.cell(row=1, column=1).value = 'Аналоги -' # Шиниа 20 -добавить пожзже форматирование
     excel_sheet.cell(row=1, column=2).value = model
     i=3
@@ -136,7 +138,6 @@ try:
     for harakter in haratkeristika:
         r=4
         for znacgenie in harakter:
-
             excel_sheet.cell(row=i, column=r).value = znacgenie
             r+=1
         i+=1
