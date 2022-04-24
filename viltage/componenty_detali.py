@@ -5,7 +5,8 @@ import requests
 import re
 
 
-model = 'ALA0236'
+#model = 'ala2610' # Два листа компонентов
+model = 'ala3231' # нет компонентов совсем
 # чтение данных с сайта и сохранение в файле
 def reader_url_saved_text(url, kol):
     try:
@@ -61,7 +62,7 @@ soup = read_text(stranica)
 # Проверияем сколько страниц, если не одна сохраняем все
 n = 1
 if soup.find('div', class_='page_number_outer'):
-    n = saved_component_ctranica(soup)
+    n = saved_component_ctranica(soup,n)
     stranica += 1
     print(f"Много листов - {stranica}")
     for s in soup.find('div', {'id': 'page_navigation'}).find_all('a'):
