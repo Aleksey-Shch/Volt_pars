@@ -4,38 +4,39 @@ import requests
 from bs4 import BeautifulSoup
 import openpyxl
 
+# чтение данных с сайта и сохранение в файле
+def reader_url_saved_text(url):
+    try:
+        headers = {
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
+            "Connection": "keep-alive",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36"
+        }
+        reg = requests.get(url, headers=headers)
+        text_html = reg.text
+    except Exception:
+        print(f"Ошибка при чтении страницы {url}")
+    try:
+        with open("index.html", "w", encoding="utf-8") as file:
+            file.write(text_html)
+    except Exception:
+        print(f"Ошибка при сохранении файла")
 
-# # чтение данных с сайта и сохранение в файле
-# def reader_url_saved_text(url):
-#     try:
-#         headers = {
-#             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-#             "Accept-Encoding": "gzip, deflate, br",
-#             "Accept-Language": "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7",
-#             "Connection": "keep-alive",
-#             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.82 Safari/537.36"
-#         }
-#
-#         reg = requests.get(url, headers=headers)
-#         text_html = reg.text
-#     except Exception:
-#         print(f"Ошибка при чтении страницы {url}")
-#     try:
-#         with open("index.html", "w", encoding="utf-8") as file:
-#             file.write(text_html)
-#     except Exception:
-#         print(f"Ошибка при сохранении файла")
-#
 # reader_url_saved_text("https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236")
-
+reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
 
 #Запись в файл
 
 # Чтение из файла и преобразовываем с soup
 def read_text():
-    with open('index.html', 'r', encoding='utf-8') as w_file:
-        src = w_file.read()
-    return BeautifulSoup(src, "lxml")
+    try:
+        with open('index.html', 'r', encoding='utf-8') as w_file:
+            src = w_file.read()
+        return BeautifulSoup(src, "lxml")
+    except Exception as err:
+        print(f"Ошибка чтения из файла. Ошибка {err}")
 
 #Чтение данных из сохраненного файла
 soup = read_text()
