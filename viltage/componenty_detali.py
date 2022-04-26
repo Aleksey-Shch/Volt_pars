@@ -5,10 +5,11 @@ import requests
 import re
 
 
-model = 'ALA0785' # Два листа компонентов
-#model = 'ala3231' 'ala2610'# нет компонентов совсем
+model = 'ala2610' # Два листа компонентов
+#model = 'ala3231' 'ala2610' 'ALA0785'# нет компонентов совсем
 # чтение данных с сайта и сохранение в файле html
 def reader_url_saved_text(url, kol):
+    print(url)
     try:
         headers = {
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -41,7 +42,7 @@ def reader_url_saved_text(url, kol):
 # поиск всех компонентов на странице с их ссылками
 def saved_component_ctranica(soup, n):
     href_componenta = soup.find('div', class_='catalog_list').find_all('div', {'class': re.compile("catalog_item ")})
-    n = 1
+    #n = 1
     for s in href_componenta:  # [0]:
         #print(f'{n}' - {s}')
         #    href_comp = s.find('div', class_='catalog_item_title').get('href')
@@ -64,13 +65,15 @@ soup = reader_url_saved_text(f"https://voltag.ru/components/list/?q={model}", st
 # Проверияем сколько страниц, если не одна сохраняем все
 n = 1
 if soup.find('div', class_='page_number_outer'):
+    print(f"Много листов - {stranica}")
     n = saved_component_ctranica(soup,n)
     stranica += 1
-    print(f"Много листов - {stranica}")
     for s in soup.find('div', {'id': 'page_navigation'}).find_all('a'):
-        sopu = reader_url_saved_text(f'https://voltag.ru{s.get("href")}', stranica)
+        print(f"Много листов - {stranica}")
+        #print(f'https://voltag.ru{s.get("href")}')
+        soup_list = reader_url_saved_text(f'https://voltag.ru{s.get("href")}', stranica)
         # тут надо сделать чтение всей станицы в файл
-        n = saved_component_ctranica(soup, n)
+        n = saved_component_ctranica(soup_list, n)
         stranica+=1
 else:
     # тут надо сделать чтение всей станицы в файл
