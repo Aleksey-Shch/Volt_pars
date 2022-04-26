@@ -5,9 +5,9 @@ import requests
 import re
 
 
-#model = 'ala2610' # Два листа компонентов
-model = 'ala3231' # нет компонентов совсем
-# чтение данных с сайта и сохранение в файле
+model = 'ala2610' # Два листа компонентов
+#model = 'ala3231' # нет компонентов совсем
+# чтение данных с сайта и сохранение в файле html
 def reader_url_saved_text(url, kol):
     try:
         headers = {
@@ -28,7 +28,7 @@ def reader_url_saved_text(url, kol):
     except Exception:
         print(f"Ошибка при сохранении файла")
 
-# Чтение из файла и преобразовываем с soup
+# Чтение из файла html и преобразовываем с soup
 def read_text(kol):
     try:
         with open(f"{kol}_index_comp_{model}.html", 'r', encoding='utf-8') as w_file:
@@ -37,6 +37,7 @@ def read_text(kol):
     except Exception as err:
         print(f'Нет такого файла - index_comp_{kol}.html. Ошибка {err}')
 
+# поиск всех компонентов на странице с их ссылками
 def saved_component_ctranica(soup, n):
     href_componenta = soup.find('div', class_='catalog_list').find_all('div', {'class': re.compile("catalog_item ")})
     n = 1
