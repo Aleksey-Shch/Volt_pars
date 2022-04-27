@@ -35,7 +35,7 @@ def read_text():
 
 def in_components(soup):
     if (soup.find('span', class_='ninf-cl').text) == "все":
-        return
+        return "Есть"
 
 # reader_url_saved_text("https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236")
 #reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
