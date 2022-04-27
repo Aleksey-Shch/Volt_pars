@@ -143,22 +143,21 @@ def save_dannix_detali(model, haratkeristika, cross, primenimost):
         print('Ошибка в формировании и сохранении файла: ' + repr(error))
 
 
-
-
 # #Запись данных в файл формата json
 # with open(f'cross_{quotes_model}.json', 'w') as j_file:
 #     json.dump(cross, j_file, indent=4, ensure_ascii=False)
 
 # reader_url_saved_text("https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236")
 # reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
-# # Вводим адрес и созраняем в фалйе через функцию
-# url_detali = input("Введите адрес страница с сата voltag.ru")
-# if len(url_detali) > 20 and url_detali.find("https://voltag.ru") == 0:
-#     reader_url_saved_text(url_detali)
-# else:
-#     print("Проверьте адрес. ")
+# Вводим адрес и созраняем в фалйе через функцию
+url_detali = input("Введите адрес страница с сата voltag.ru")
+if len(url_detali) > 20 and url_detali.find("https://voltag.ru") == 0:
+    reader_url_saved_text(url_detali)
+else:
+    print("Проверьте адрес. ")
 
 # Чтение данных из сохраненного файла
 soup = read_text()
+save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup), filter_primenomost(soup))
+#in_components(soup)
 
-in_components(soup)
