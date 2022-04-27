@@ -150,14 +150,17 @@ def save_dannix_detali(model, haratkeristika, cross, primenimost):
 # reader_url_saved_text("https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236")
 # reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
 # Вводим адрес и созраняем в фалйе через функцию
-url_detali = input("Введите адрес страница с сата voltag.ru")
+url_detali = input("Введите адрес страница с сата voltag.ru или просто Enter")
 if len(url_detali) > 20 and url_detali.find("https://voltag.ru") == 0:
-    reader_url_saved_text(url_detali)
+    reader_url_saved_text(url_detali) # сохраняем новую страницу
+    soup = read_text() #делаем суп
+    # сохраняем данные в файл
+    save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup), filter_primenomost(soup))
 else:
-    print("Проверьте адрес. ")
+    soup = read_text() #делаем суп
+    # сохраняем данные в файл
+    save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup), filter_primenomost(soup))
 
-# Чтение данных из сохраненного файла
-soup = read_text()
-save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup), filter_primenomost(soup))
+
+
 #in_components(soup)
-
