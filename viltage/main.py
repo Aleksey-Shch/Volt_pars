@@ -24,15 +24,6 @@ def reader_url_saved_text(url):
     except Exception:
         print(f"Ошибка при сохранении файла")
 
-# reader_url_saved_text("https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236")
-#reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
-# Вводим адрес и созраняем в фалйе через функцию
-url_detali = input("Введите адрес страница с сата voltag.ru")
-if len(url_detali) > 20 and url_detali.find("https://voltag.ru") == 0:
-    reader_url_saved_text(url_detali)
-else:
-    print("Проверьте адрес. ")
-
 # Чтение из файла и преобразовываем с soup
 def read_text():
     try:
@@ -42,8 +33,22 @@ def read_text():
     except Exception as err:
         print(f"Ошибка чтения из файла. Ошибка {err}")
 
+def in_components(soup):
+    if (soup.find('span', class_='ninf-cl').text) == "все":
+        return
+
+# reader_url_saved_text("https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236")
+#reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
+# # Вводим адрес и созраняем в фалйе через функцию
+# url_detali = input("Введите адрес страница с сата voltag.ru")
+# if len(url_detali) > 20 and url_detali.find("https://voltag.ru") == 0:
+#     reader_url_saved_text(url_detali)
+# else:
+#     print("Проверьте адрес. ")
+
 #Чтение данных из сохраненного файла
 soup = read_text()
+in_components(soup)
 
 # фильтрация данных характеристики
 quotes_harakteristika = soup.find('div', class_='catalog_group_params').find_all('tr')
@@ -54,7 +59,7 @@ quotes_primenimost = soup.find('div', class_='catalog_group_application_info')
 # фильтрация названия модели
 model = ''.join(soup.find('div', class_='catalog_group_title').text.split())
 #quotes_model1 = ''.join(quotes_model.split())
-#print(quotes_primenimost)
+
 
 #форматирование данных характеристики haratkeristika
 haratkeristika = []
