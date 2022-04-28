@@ -90,14 +90,17 @@ def save_dannix_detali(model, haratkeristika, cross, primenimost):
             excel_file = openpyxl.load_workbook(f'{model}.xlsx')
             shet_names = excel_file.sheetnames
             if model in shet_names:  # проверияем существует ли лист с такой деталью
-                #print('Yes')
-                excel_sheet = excel_file[model]
+                print(f'Есть такой лист. Сохранено как {model}new')
+                excel_sheet = excel_file.create_sheet(title=(f'{model}NEW'))
+                #excel_sheet = excel_file[model]
             else:
                 #print('No')
                 excel_sheet = excel_file.create_sheet(title=model)
         else:  # Иначе открываем пустой и формуем лист
             excel_file = openpyxl.Workbook()
-            excel_sheet = excel_file.create_sheet(title=model)
+            excel_sheet = excel_file.active
+            excel_sheet.title = model
+            #excel_sheet = excel_file.create_sheet(title=model) # новая страница, имя model
 
         # Установки ширины столбцов
         excel_sheet.column_dimensions["A"].width = 5
@@ -149,6 +152,10 @@ def save_dannix_detali(model, haratkeristika, cross, primenimost):
 
 # reader_url_saved_text("https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236")
 # reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
+#https://voltag.ru/catalog/group/voltag_ala0879_generator/ # 3 страницы компонентов
+#https://voltag.ru/components/list/?q=ALA0879
+#https://voltag.ru/components/list/p-2/?q=ALA0879
+#https://voltag.ru/components/list/p-3/?q=ALA0879
 # Вводим адрес и созраняем в фалйе через функцию
 
 #in_components(soup)
