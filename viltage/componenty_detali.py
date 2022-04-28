@@ -1,7 +1,6 @@
 # https://voltag.ru/catalog/group/voltag_alb0829_generator/ - основной сайт
 # https://voltag.ru/components/list/?q=ALB0829 - компоненты
 from bs4 import BeautifulSoup
-import main
 import requests
 import re
 
@@ -35,7 +34,8 @@ def saved_component_ctranica(soup):
             href_comp = 'https://voltag.ru' + s.find('a').get('href')
             nomer_comp = (s.find('div', class_='catalog_item_title_wrap').text).replace("\n","")
             nazvanie_comp = s.find('div', class_='catalog_item_subtitle').text
-            print(f'{nomer_comp} - {nazvanie_comp} - {href_comp}') #, sep="\n")
+            #print(f'{nomer_comp} - {nazvanie_comp} - {href_comp}') #, sep="\n")
+            spisok_componentov[nomer_comp] = [nazvanie_comp, href_comp]
             # #Запись данных в файл формата json
             # with open(f'cross_{quotes_model}.json', 'w') as j_file:
             #     json.dump(cross, j_file, indent=4, ensure_ascii=False)
@@ -59,11 +59,18 @@ def perebor_pages_component(soup):
         saved_component_ctranica(soup)
         print('Все!')
 
+def update_dictionary(d, key, value):
+    # put your python code here
+    if d.get(key) == None:
+        d[key]=(value)
 
+
+spisok_componentov={}
 model = 'ALA0879' # три листа компонентов
-#model = 'ala3231' 'ala2610' 'ALA0785'# нет компонентов совсем
+#model = 'ala3231' 'ala2610' 'ALA0785' 'ALA0879' # нет компонентов совсем
 #Сохраняем первую страницу
 soup = reader_url_component(f"https://voltag.ru/components/list/p-1/?q={model}")
 perebor_pages_component(soup)
 
-
+for keys, values in spisok_componentov.items():
+    print(f'{keys} - {values}')
