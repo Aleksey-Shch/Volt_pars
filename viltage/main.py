@@ -24,15 +24,6 @@ def reader_url_saved_text(url):
     except Exception:
         print(f"Ошибка при сохранении файла")
 
-# reader_url_saved_text("https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236")
-#reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
-# Вводим адрес и созраняем в фалйе через функцию
-url_detali = input("Введите адрес страница с сата voltag.ru")
-if len(url_detali) > 20 and url_detali.find("https://voltag.ru") == 0:
-    reader_url_saved_text(url_detali)
-else:
-    print("Проверьте адрес. ")
-
 # Чтение из файла и преобразовываем с soup
 def read_text():
     try:
@@ -42,117 +33,144 @@ def read_text():
     except Exception as err:
         print(f"Ошибка чтения из файла. Ошибка {err}")
 
-#Чтение данных из сохраненного файла
-soup = read_text()
+def in_components(soup):
+    if (soup.find('span', class_='ninf-cl').text) == "все":
+        return "Есть"
+
+# фильтрация названия модели
+def filter_model(soup):
+    model = ''.join(soup.find('div', class_='catalog_group_title').text.split())
+    return model
 
 # фильтрация данных характеристики
-quotes_harakteristika = soup.find('div', class_='catalog_group_params').find_all('tr')
+def filter_harakteristika(soup):
+    quotes_harakteristika = soup.find('div', class_='catalog_group_params').find_all('tr')
+    # форматирование данных характеристики haratkeristika
+    haratkeristika = []
+    for znac in quotes_harakteristika:
+        data = [x.get_text().replace('\xa0', ' ') for x in znac.find_all('td')]
+        if len(data) != 0:
+            haratkeristika.append(data)
+    return haratkeristika
+
 # фильтрация данных кроссов
-quotes_kross = soup.find('div', class_='catalog_group_crosslist_info')
+def filter_kross(soup):
+    quotes_kross = soup.find('div', class_='catalog_group_crosslist_info')
+
+    # форматирование данных кроссов cross
+    cross = {}
+    katal = 'Zero'
+    for td in quotes_kross.find_all('td'):
+        znac = td.text.strip()
+        if str(td).find('mnfr') == -1:
+            if len(znac.split(', ')) == 1:
+                cross[katal] = znac
+            else:
+                for td1 in (znac.split(', ')):
+                    cross.setdefault(katal, []).append(td1)
+        else:
+            if znac == '':
+                katal = 'Zero'
+            else:
+                katal = znac
+    return cross
+
 # фильтраци данных применимости
-quotes_primenimost = soup.find('div', class_='catalog_group_application_info')
-# фильтрация названия модели
-model = ''.join(soup.find('div', class_='catalog_group_title').text.split())
-#quotes_model1 = ''.join(quotes_model.split())
-#print(quotes_primenimost)
+def filter_primenomost(soup):
+    quotes_primenimost = soup.find('div', class_='catalog_group_application_info')
+    # форматирование данных применимости primenimost
+    primenimost = [[x.replace('\t', ' ')] for x in quotes_primenimost.text.split('\n')]
+    return primenimost
 
-#форматирование данных характеристики haratkeristika
-haratkeristika = []
-for znac in quotes_harakteristika:
-    data = [x.get_text().replace('\xa0', ' ') for x in znac.find_all('td')]
-    if len(data) != 0:
-        haratkeristika.append(data)
-#print(haratkeristika, '-')
+# запись данных в файл
+def save_dannix_detali(model, haratkeristika, cross, primenimost):
 
-#форматирование данных кроссов cross
-cross = {}
-katal = 'Zero'
-for td in quotes_kross.find_all('td'):
-    znac = td.text.strip()
-    if str(td).find('mnfr') == -1:
-        #print(len(znac.split(', ')))
-        if len(znac.split(', '))==1:
-            cross[katal]=znac
-        else:
-            for td1 in (znac.split(', ')):
-                cross.setdefault(katal, []).append(td1)
-    else:
-        if znac =='':
-            katal = 'Zero'
-        else:
-            katal=znac
-#print(cross)
+    try:
+        if os.path.isfile(f'{model}.xlsx'):  # Если файл сужествует открываем для записи
+            excel_file = openpyxl.load_workbook(f'{model}.xlsx')
+            shet_names = excel_file.sheetnames
+            if model in shet_names:  # проверияем существует ли лист с такой деталью
+                print(f'Есть такой лист. Сохранено как {model}new')
+                excel_sheet = excel_file.create_sheet(title=(f'{model}NEW'))
+                #excel_sheet = excel_file[model]
+            else:
+                #print('No')
+                excel_sheet = excel_file.create_sheet(title=model)
+        else:  # Иначе открываем пустой и формуем лист
+            excel_file = openpyxl.Workbook()
+            excel_sheet = excel_file.active
+            excel_sheet.title = model
+            #excel_sheet = excel_file.create_sheet(title=model) # новая страница, имя model
+
+        # Установки ширины столбцов
+        excel_sheet.column_dimensions["A"].width = 5
+        excel_sheet.column_dimensions["B"].width = 30
+        excel_sheet.column_dimensions["C"].width = 12
+
+        # Запись даннаых характеристики в файл
+        excel_sheet.cell(row=1, column=2).value = 'Характеристика детали'
+
+        stroka = 3
+        for harakter in haratkeristika:
+            stolb = 1
+            for znacgenie in harakter:
+                excel_sheet.cell(row=stroka, column=stolb).value = znacgenie
+                stolb += 1
+            stroka += 1
+
+        # Запись сроссов в файл
+        excel_sheet.cell(row=stroka + 1, column=2).value = 'Аналоги -'  # Шиниа 20 -добавить пожзже форматирование
+        excel_sheet.cell(row=stroka + 1, column=3).value = model
+        stroka += 3
+        for katalo, nomra in cross.items():
+            if isinstance(nomra, str):
+                excel_sheet.cell(row=stroka, column=2).value = katalo
+                excel_sheet.cell(row=stroka, column=3).value = nomra
+                stroka += 1
+            else:
+                for nomer in nomra:
+                    excel_sheet.cell(row=stroka, column=2).value = katalo
+                    excel_sheet.cell(row=stroka, column=3).value = nomer
+                    stroka += 1
+
+        # Запись применимости
+        excel_sheet.cell(row=stroka+2, column=2).value = 'Список применимости:'
+
+        stroka += 3
+        for avto in primenimost:
+            excel_sheet.cell(row=stroka, column=2).value = ''.join(avto).strip()
+            stroka += 1
+
+        excel_file.save(f'{model}.xlsx')
+    except Exception as error:
+        print('Ошибка в формировании и сохранении файла: ' + repr(error))
+
 
 # #Запись данных в файл формата json
 # with open(f'cross_{quotes_model}.json', 'w') as j_file:
 #     json.dump(cross, j_file, indent=4, ensure_ascii=False)
 
-#форматирование данных применимости primenimost
-primenimost = [[x.replace('\t', ' ')] for x in quotes_primenimost.text.split('\n')]
-#print(primenimost)
+# reader_url_saved_text("https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236")
+# reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
+#https://voltag.ru/catalog/group/voltag_ala0879_generator/ # 3 страницы компонентов
+#https://voltag.ru/components/list/?q=ALA0879
+#https://voltag.ru/components/list/p-2/?q=ALA0879
+#https://voltag.ru/components/list/p-3/?q=ALA0879
+# Вводим адрес и созраняем в фалйе через функцию
 
-# запись данных в файл
-try:
-    if os.path.isfile('team.xlsx'): # Если файл сужествует открываем для записи
-        excel_file = openpyxl.load_workbook('team.xlsx')
-        shet_names = excel_file.sheetnames
-        if model in shet_names: # проверияем существует ли лист с такой деталью
-            print('Yes')
-            excel_sheet = excel_file[model]
-        else:
-            print('No')
-            excel_sheet = excel_file.create_sheet(title=model)
-    else: # Иначе открываем пустой и формуем лист
-        excel_file = openpyxl.Workbook()
-        excel_sheet = excel_file.create_sheet(title=model)
+#in_components(soup)
+if __name__ == '__main__':
+    url_detali = input(f"Введите адрес страница с сата voltag.ru или просто Enter \n")
+    if len(url_detali) > 20 and url_detali.find("https://voltag.ru") == 0:
+        reader_url_saved_text(url_detali)  # сохраняем новую страницу
+        soup = read_text()  # делаем суп
+        # сохраняем данные в файл
+        save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup),
+                           filter_primenomost(soup))
+    else:
+        soup = read_text()  # делаем суп
+        # сохраняем данные в файл
+        save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup),
+                           filter_primenomost(soup))
 
-
-    #Установки ширины столбцов
-    excel_sheet.column_dimensions["A"].width = 18
-    excel_sheet.column_dimensions["B"].width = 18
-    excel_sheet.column_dimensions["C"].width = 5
-    excel_sheet.column_dimensions["D"].width = 5
-    excel_sheet.column_dimensions["E"].width = 30
-    excel_sheet.column_dimensions["F"].width = 8
-    excel_sheet.column_dimensions["G"].width = 5
-    excel_sheet.column_dimensions["H"].width = 5
-    excel_sheet.column_dimensions["I"].width = 50
-
-    # Запись сроссов в файл
-    excel_sheet.cell(row=1, column=1).value = 'Аналоги -' # Шиниа 20 -добавить пожзже форматирование
-    excel_sheet.cell(row=1, column=2).value = model
-    i=3
-    for katalo, nomra in cross.items():
-        if isinstance(nomra,str):
-            excel_sheet.cell(row=i, column=1).value = katalo
-            excel_sheet.cell(row=i, column=2).value = nomra
-            i+=1
-        else:
-            for nomer in nomra:
-                excel_sheet.cell(row=i, column=1).value = katalo
-                excel_sheet.cell(row=i, column=2).value = nomer
-                i += 1
-
-    # """
-    # Запись даннаых характеристики в файл
-    excel_sheet.cell(row=1, column=4).value = 'Характеристика детали'
-
-    i=3
-    for harakter in haratkeristika:
-        r=4
-        for znacgenie in harakter:
-            excel_sheet.cell(row=i, column=r).value = znacgenie
-            r+=1
-        i+=1
-
-    # Запись примениомсти
-    excel_sheet.cell(row=1, column=9).value = 'Список применимости:'
-
-    i=3
-    for avto in primenimost:
-        excel_sheet.cell(row=i, column=9).value = ''.join(avto).strip()
-        i+=1
-
-    excel_file.save('team.xlsx')
-except Exception as error:
-        print('Ошибка в формировании и сохранении файла: ' + repr(error))
+    print('Готово')

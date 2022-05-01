@@ -7,7 +7,7 @@ def read_text():
         src = w_file.read()
     return BeautifulSoup(src, "lxml")
 
-#Чтение данных из сохраненного файлаid="page_navigation"
+#Чтение данных из сохраненного файла id="page_navigation"
 soup = read_text()
 
 # for s in soup.find('div', {'id': 'page_navigation'}).find_all('a'):

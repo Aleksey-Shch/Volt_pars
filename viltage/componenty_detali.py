@@ -5,11 +5,8 @@ import requests
 import re
 
 
-model = 'ala3231' # Два листа компонентов
-#model = 'ala3231' 'ala2610' 'ALA0785'# нет компонентов совсем
 # чтение данных с сайта и сохранение в файле html
-def reader_url_saved_text(url, kol):
-    print(url)
+def reader_url_component(url):
     try:
         headers = {
             "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
@@ -23,24 +20,10 @@ def reader_url_saved_text(url, kol):
         text_html = reg.text
     except Exception:
         print(f"Ошибка при чтении страницы {url}")
-    try:
-        with open(f"{kol}_index_comp_{model}.html", "w", encoding="utf-8") as file:
-            file.write(text_html)
-            return BeautifulSoup(text_html, "lxml")
-    except Exception:
-        print(f"Ошибка при сохранении файла")
-
-# Чтение из файла html и преобразовываем с soup
-#def read_text(kol):
-#    try:
-#        with open(f"{kol}_index_comp_{model}.html", 'r', encoding='utf-8') as w_file:
-#            src = w_file.read()
-#        return BeautifulSoup(src, "lxml")
-#    except Exception as err:
-#        print(f'Нет такого файла - index_comp_{kol}.html. Ошибка {err}')
+    return BeautifulSoup(text_html, "lxml")
 
 # поиск всех компонентов на странице с их ссылками
-def saved_component_ctranica(soup, n):
+def saved_component_ctranica(soup):
     # проверка на наличие компонентов
     if soup.find('div', class_ = 'catalog_item_title_wrap'):
         href_componenta = soup.find('div', class_='catalog_list').find_all('div', {'class': re.compile("catalog_item ")})
@@ -51,34 +34,43 @@ def saved_component_ctranica(soup, n):
             href_comp = 'https://voltag.ru' + s.find('a').get('href')
             nomer_comp = (s.find('div', class_='catalog_item_title_wrap').text).replace("\n","")
             nazvanie_comp = s.find('div', class_='catalog_item_subtitle').text
-            print(f'{n} - {nomer_comp} - {nazvanie_comp} - {href_comp}') #, sep="\n")
-            n += 1
-        return n
+            #print(f'{nomer_comp} - {nazvanie_comp} - {href_comp}') #, sep="\n")
+            spisok_componentov[nomer_comp] = [nazvanie_comp, href_comp]
+            # #Запись данных в файл формата json
+            # with open(f'cross_{quotes_model}.json', 'w') as j_file:
+            #     json.dump(cross, j_file, indent=4, ensure_ascii=False)
+        return
     print('ничего нет')
 
-#Сохраняем первую страницу
-stranica = 1
-soup = reader_url_saved_text(f"https://voltag.ru/components/list/?q={model}", stranica)
-
-
-#Чтение данных из сохраненного файла
-#soup = read_text(stranica)
-
-
+#Перебираем все страницы и сохраняем список компонентов
 # Проверияем сколько страниц, если не одна сохраняем все
-n = 1
-if soup.find('div', class_='page_number_outer'):
-    print(f"Много листов - {stranica}")
-    n = saved_component_ctranica(soup,n)
-    stranica += 1
-    for s in soup.find('div', {'id': 'page_navigation'}).find_all('a'):
-        print(f"Много листов - {stranica}")
-        soup_list = reader_url_saved_text(f'https://voltag.ru{s.get("href")}', stranica)
+def perebor_pages_component(soup):
+    if soup.find('div', class_='page_number_outer'):
+        print(f"Много листов ")
+        saved_component_ctranica(soup)
+        for s in soup.find('div', {'id': 'page_navigation'}).find_all('a'):
+            # print(f"Много листов - {stranica}")
+            soup_list = reader_url_component(f'https://voltag.ru{s.get("href")}')
+            # тут надо сделать чтение всей станицы в файл
+            saved_component_ctranica(soup_list)
+    else:
         # тут надо сделать чтение всей станицы в файл
-        n = saved_component_ctranica(soup_list, n)
-        stranica+=1
-else:
-    # тут надо сделать чтение всей станицы в файл
-    print(f"Один листов - {stranica}")
-    n = saved_component_ctranica(soup,n)
-    print('Все!')
+        # print(f"Один листов - {stranica}")
+        saved_component_ctranica(soup)
+        print('Все!')
+
+def update_dictionary(d, key, value):
+    # put your python code here
+    if d.get(key) == None:
+        d[key]=(value)
+
+
+spisok_componentov={}
+model = 'ALA0879' # три листа компонентов
+#model = 'ala3231' 'ala2610' 'ALA0785' 'ALA0879' # нет компонентов совсем
+#Сохраняем первую страницу
+soup = reader_url_component(f"https://voltag.ru/components/list/p-1/?q={model}")
+perebor_pages_component(soup)
+
+for keys, values in spisok_componentov.items():
+    print(f'{keys} - {values}')
