@@ -145,6 +145,18 @@ def save_dannix_detali(model, haratkeristika, cross, primenimost):
     except Exception as error:
         print('Ошибка в формировании и сохранении файла: ' + repr(error))
 
+def sup_save(url):
+    if len(url) > 20 and url_detali.find("https://voltag.ru") == 0:
+        reader_url_saved_text(url_detali)  # сохраняем новую страницу
+        soup = read_text()  # делаем суп
+        save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup),
+                           filter_primenomost(soup))
+    else:
+        soup = read_text()  # делаем суп
+        save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup),
+                           filter_primenomost(soup))
+
+
 
 # #Запись данных в файл формата json
 # with open(f'cross_{quotes_model}.json', 'w') as j_file:
@@ -161,19 +173,6 @@ def save_dannix_detali(model, haratkeristika, cross, primenimost):
 #in_components(soup)
 if __name__ == '__main__':
     url_detali = input(f"Введите адрес страница с сата voltag.ru или просто Enter \n")
-    #проверяем на наличие введенного адреса,
-    # если есть сохраняем и обрабатываем,
-    # если нету то берем с сохраненного
-    if len(url_detali) > 20 and url_detali.find("https://voltag.ru") == 0:
-        reader_url_saved_text(url_detali)  # сохраняем новую страницу
-        soup = read_text()  # делаем суп
-        # сохраняем данные в файл
-        save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup),
-                           filter_primenomost(soup))
-    else:
-        soup = read_text()  # делаем суп
-        # сохраняем данные в файл
-        save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup),
-                           filter_primenomost(soup))
+    sup_save(url_detali)
 
     print('Готово')
