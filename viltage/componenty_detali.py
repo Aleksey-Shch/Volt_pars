@@ -1,8 +1,10 @@
 # https://voltag.ru/catalog/group/voltag_alb0829_generator/ - основной сайт
 # https://voltag.ru/components/list/?q=ALB0829 - компоненты
 from bs4 import BeautifulSoup
+import os.path
 import requests
 import re
+import openpyxl
 
 
 # чтение данных с сайта и формирыем сразу суп
@@ -46,6 +48,7 @@ def saved_component_ctranica(soup):
 # Проверияем сколько страниц, если не одна перебираем
 # все страницы и сохраняем список компонентов
 def perebor_pages_component(soup):
+    res=[]
     if soup.find('div', class_='page_number_outer'):
         print(f"Много листов ")
         saved_component_ctranica(soup)
@@ -60,12 +63,47 @@ def perebor_pages_component(soup):
         saved_component_ctranica(soup)
         print('Все!')
 
-spisok_componentov={}
-model = 'ALA0879' # три листа компонентовa
-#model = 'ala3231' 'ala2610' 'ALA0785' 'ALA0879' # нет компонентов совсем
-#Сохраняем первую страницу
-soup = reader_url_component(f"https://voltag.ru/components/list/p-1/?q={model}")
-perebor_pages_component(soup)
+def save_components(model, spisok):  #, haratkeristika, cross, primenimost):
+    try:
+        if os.path.isfile(f'{model}.xlsx'):  # Если файл сужествует открываем для записи
+            excel_file = openpyxl.load_workbook(f'{model}.xlsx')
+            shet_names = excel_file.sheetnames
+            if model in shet_names:  # проверияем существует ли лист с такой деталью
+                print(f'Есть такой лист. Сохранено как {model}new')
+                excel_sheet = excel_file.create_sheet(title=(f'{model}_компонент'))
+                #excel_sheet = excel_file[model]
+            else:
+                #print('No')
+                excel_sheet = excel_file.create_sheet(title=model)
+        else:  # Иначе открываем пустой и формуем лист
+            excel_file = openpyxl.Workbook()
+            excel_sheet = excel_file.active
+            excel_sheet.title = (f'{model}_компонент')
+            #excel_sheet = excel_file.create_sheet(title=model) # новая страница, имя model
+        # Запись даннаых характеристики в файл
+        excel_sheet.cell(row=1, column=2).value = 'Список компонентов'
 
-for keys, values in spisok_componentov.items():
-    print(f'{keys} - {values}')
+        stroka = 3
+        for keys, values in spisok.items():
+            print(f'{keys} - {values}')
+            excel_sheet.cell(row=stroka, column=1).value = keys
+            excel_sheet.cell(row=stroka, column=2).value = values[0]
+            excel_sheet.cell(row=stroka, column=3).value = values[1]
+            stroka += 1
+        excel_file.save(f'{model}.xlsx')
+
+    except Exception as error:
+        print('Ошибка в формировании и сохранении файла: ' + repr(error))
+
+if __name__ == '__main__':
+    spisok_componentov={}
+    model = 'ALA0879' # три листа компонентовa
+    #model = 'ala3231' 'ala2610' 'ALA0785' 'ALA0879' # нет компонентов совсем
+    #Сохраняем первую страницу
+    soup = reader_url_component(f"https://voltag.ru/components/list/p-1/?q={model}")
+    perebor_pages_component(soup)
+
+    save_components(model, spisok_componentov)
+
+    for keys, values in spisok_componentov.items():
+        print(f'{keys} - {values}')
