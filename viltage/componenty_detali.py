@@ -68,13 +68,13 @@ def save_components(model, spisok):  #, haratkeristika, cross, primenimost):
         if os.path.isfile(f'{model}.xlsx'):  # Если файл сужествует открываем для записи
             excel_file = openpyxl.load_workbook(f'{model}.xlsx')
             shet_names = excel_file.sheetnames
-            if model in shet_names:  # проверияем существует ли лист с такой деталью
+            if (f'{model}_компонент') in shet_names:  # проверияем существует ли лист с такой деталью
                 print(f'Есть такой лист. Сохранено как {model}new')
-                excel_sheet = excel_file.create_sheet(title=(f'{model}_компонент'))
+                excel_sheet = excel_file.create_sheet(title=(f'{model}_компонент1'))
                 #excel_sheet = excel_file[model]
             else:
                 #print('No')
-                excel_sheet = excel_file.create_sheet(title=model)
+                excel_sheet = excel_file.create_sheet(title=(f'{model}_компонент'))
         else:  # Иначе открываем пустой и формуем лист
             excel_file = openpyxl.Workbook()
             excel_sheet = excel_file.active
@@ -97,7 +97,7 @@ def save_components(model, spisok):  #, haratkeristika, cross, primenimost):
 
 if __name__ == '__main__':
     spisok_componentov={}
-    model = 'ALA0879' # три листа компонентовa
+    model = 'ALA2610' # три листа компонентовa
     #model = 'ala3231' 'ala2610' 'ALA0785' 'ALA0879' # нет компонентов совсем
     #Сохраняем первую страницу
     soup = reader_url_component(f"https://voltag.ru/components/list/p-1/?q={model}")

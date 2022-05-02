@@ -146,8 +146,8 @@ def save_dannix_detali(model, haratkeristika, cross, primenimost):
         print('Ошибка в формировании и сохранении файла: ' + repr(error))
 
 def sup_save(url):
-    if len(url) > 20 and url_detali.find("https://voltag.ru") == 0:
-        reader_url_saved_text(url_detali)  # сохраняем новую страницу
+    if len(url) > 20 and url.find("https://voltag.ru") == 0:
+        reader_url_saved_text(url)  # сохраняем новую страницу
         soup = read_text()  # делаем суп
         save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup),
                            filter_primenomost(soup))
