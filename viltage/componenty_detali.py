@@ -5,7 +5,7 @@ import requests
 import re
 
 
-# чтение данных с сайта и сохранение в файле html
+# чтение данных с сайта и формирыем сразу суп
 def reader_url_component(url):
     try:
         headers = {
@@ -40,10 +40,11 @@ def saved_component_ctranica(soup):
             # with open(f'cross_{quotes_model}.json', 'w') as j_file:
             #     json.dump(cross, j_file, indent=4, ensure_ascii=False)
         return
-    print('ничего нет')
+    print('Компонентов нет')
 
-#Перебираем все страницы и сохраняем список компонентов
-# Проверияем сколько страниц, если не одна сохраняем все
+
+# Проверияем сколько страниц, если не одна перебираем
+# все страницы и сохраняем список компонентов
 def perebor_pages_component(soup):
     if soup.find('div', class_='page_number_outer'):
         print(f"Много листов ")
@@ -59,14 +60,8 @@ def perebor_pages_component(soup):
         saved_component_ctranica(soup)
         print('Все!')
 
-def update_dictionary(d, key, value):
-    # put your python code here
-    if d.get(key) == None:
-        d[key]=(value)
-
-
 spisok_componentov={}
-model = 'ALA0879' # три листа компонентов
+model = 'ALA0879' # три листа компонентовa
 #model = 'ala3231' 'ala2610' 'ALA0785' 'ALA0879' # нет компонентов совсем
 #Сохраняем первую страницу
 soup = reader_url_component(f"https://voltag.ru/components/list/p-1/?q={model}")

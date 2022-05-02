@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import openpyxl
 
-# чтение данных с сайта и сохранение в файле
+# чтение данных с сайта и сохранение в файле index.html
 def reader_url_saved_text(url):
     try:
         headers = {
@@ -24,7 +24,7 @@ def reader_url_saved_text(url):
     except Exception:
         print(f"Ошибка при сохранении файла")
 
-# Чтение из файла и преобразовываем с soup
+# Чтение из файла и преобразовываем с soup return BeautifulSoup
 def read_text():
     try:
         with open('index.html', 'r', encoding='utf-8') as w_file:
@@ -161,6 +161,9 @@ def save_dannix_detali(model, haratkeristika, cross, primenimost):
 #in_components(soup)
 if __name__ == '__main__':
     url_detali = input(f"Введите адрес страница с сата voltag.ru или просто Enter \n")
+    #проверяем на наличие введенного адреса,
+    # если есть сохраняем и обрабатываем,
+    # если нету то берем с сохраненного
     if len(url_detali) > 20 and url_detali.find("https://voltag.ru") == 0:
         reader_url_saved_text(url_detali)  # сохраняем новую страницу
         soup = read_text()  # делаем суп
