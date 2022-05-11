@@ -1,11 +1,8 @@
-# https://voltag.ru/catalog/group/voltag_alb0829_generator/ - основной сайт
-# https://voltag.ru/components/list/?q=ALB0829 - компоненты
 from bs4 import BeautifulSoup
 import os.path
 import requests
 import re
 import openpyxl
-
 
 # чтение данных с сайта и формирыем сразу суп
 def reader_url_component(url):
@@ -44,7 +41,6 @@ def saved_component_ctranica(soup):
             #     json.dump(cross, j_file, indent=4, ensure_ascii=False)
         return spisok_componentov
     print('Компонентов нет')
-
 
 # Проверияем сколько страниц, если не одна перебираем
 # все страницы и сохраняем список компонентов
@@ -107,7 +103,6 @@ if __name__ == '__main__':
     #Сохраняем первую страницу
     soup = reader_url_component(f"https://voltag.ru/components/list/p-1/?q={model}")
     perebor_pages_component(soup)
-
     save_components(model, spisok_componentov)
 
     for keys, values in spisok_componentov.items():

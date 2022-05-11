@@ -165,19 +165,6 @@ def sup_save(url, model_osnova=None):
                            filter_primenomost(soup))
     return filter_model(soup)
 
-
-# #Запись данных в файл формата json
-# with open(f'cross_{quotes_model}.json', 'w') as j_file:
-#     json.dump(cross, j_file, indent=4, ensure_ascii=False)
-
-# reader_url_saved_text("https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236")
-# reader_url_saved_text("https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610")
-#https://voltag.ru/catalog/group/voltag_ala0879_generator/ # 3 страницы компонентов
-#https://voltag.ru/components/list/?q=ALA0879
-#https://voltag.ru/components/list/p-2/?q=ALA0879
-#https://voltag.ru/components/list/p-3/?q=ALA0879
-# Вводим адрес и созраняем в фалйе через функцию
-
 #in_components(soup)
 if __name__ == '__main__':
 #    url_detali = input(f"Введите адрес страница с сата voltag.ru или просто Enter \n")
