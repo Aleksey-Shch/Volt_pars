@@ -27,6 +27,7 @@ def reader_url_component(url):
 # поиск всех компонентов на странице с их ссылками
 def saved_component_ctranica(soup):
     # проверка на наличие компонентов
+    spisok_componentov={}
     if soup.find('div', class_ = 'catalog_item_title_wrap'):
         href_componenta = soup.find('div', class_='catalog_list').find_all('div', {'class': re.compile("catalog_item ")})
         #n = 1 catalog_item_title_wrap
@@ -41,27 +42,31 @@ def saved_component_ctranica(soup):
             # #Запись данных в файл формата json
             # with open(f'cross_{quotes_model}.json', 'w') as j_file:
             #     json.dump(cross, j_file, indent=4, ensure_ascii=False)
-        return
+        return spisok_componentov
     print('Компонентов нет')
 
 
 # Проверияем сколько страниц, если не одна перебираем
 # все страницы и сохраняем список компонентов
 def perebor_pages_component(soup):
-    res=[]
+    res, res_temp = {}, {}
     if soup.find('div', class_='page_number_outer'):
         print(f"Много листов ")
-        saved_component_ctranica(soup)
+        res_temp=res.copy()
+        res = {**res_temp, **(saved_component_ctranica(soup))}
         for s in soup.find('div', {'id': 'page_navigation'}).find_all('a'):
             # print(f"Много листов - {stranica}")
             soup_list = reader_url_component(f'https://voltag.ru{s.get("href")}')
             # тут надо сделать чтение всей станицы в файл
-            saved_component_ctranica(soup_list)
+            res_temp = res.copy()
+            res = {**res_temp, **(saved_component_ctranica(soup_list))}
     else:
         # тут надо сделать чтение всей станицы в файл
         # print(f"Один листов - {stranica}")
-        saved_component_ctranica(soup)
+        res_temp = res.copy()
+        res = {**res_temp, **(saved_component_ctranica(soup))}
         print('Все!')
+    return res
 
 def save_components(model, spisok):  #, haratkeristika, cross, primenimost):
     try:

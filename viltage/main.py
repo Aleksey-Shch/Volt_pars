@@ -3,6 +3,8 @@ import os.path
 import requests
 from bs4 import BeautifulSoup
 import openpyxl
+import componenty_detali
+
 
 # чтение данных с сайта и сохранение в файле index.html
 def reader_url_saved_text(url):
@@ -27,7 +29,7 @@ def reader_url_saved_text(url):
 # Чтение из файла и преобразовываем с soup return BeautifulSoup
 def read_text():
     try:
-        with open('index.html', 'r', encoding='utf-8') as w_file:
+        with open("index.html", "r", encoding="utf-8") as w_file:
             src = w_file.read()
         return BeautifulSoup(src, "lxml")
     except Exception as err:
@@ -83,23 +85,23 @@ def filter_primenomost(soup):
     return primenimost
 
 # запись данных в файл
-def save_dannix_detali(model, haratkeristika, cross, primenimost):
+def save_dannix_detali(model, haratkeristika, cross, primenimost, list='model'):
 
     try:
         if os.path.isfile(f'{model}.xlsx'):  # Если файл сужествует открываем для записи
             excel_file = openpyxl.load_workbook(f'{model}.xlsx')
             shet_names = excel_file.sheetnames
-            if model in shet_names:  # проверияем существует ли лист с такой деталью
-                print(f'Есть такой лист. Сохранено как {model}new')
-                excel_sheet = excel_file.create_sheet(title=(f'{model}NEW'))
+            if list in shet_names:  # проверияем существует ли лист с такой деталью
+                print(f'Есть такой лист. Сохранено как {list}new')
+                excel_sheet = excel_file.create_sheet(title=(f'{list}NEW'))
                 #excel_sheet = excel_file[model]
             else:
                 #print('No')
-                excel_sheet = excel_file.create_sheet(title=model)
+                excel_sheet = excel_file.create_sheet(title=list)
         else:  # Иначе открываем пустой и формуем лист
             excel_file = openpyxl.Workbook()
             excel_sheet = excel_file.active
-            excel_sheet.title = model
+            excel_sheet.title = list
             #excel_sheet = excel_file.create_sheet(title=model) # новая страница, имя model
 
         # Установки ширины столбцов
@@ -145,17 +147,23 @@ def save_dannix_detali(model, haratkeristika, cross, primenimost):
     except Exception as error:
         print('Ошибка в формировании и сохранении файла: ' + repr(error))
 
-def sup_save(url):
+def sup_save(url, model_osnova=None):
     if len(url) > 20 and url.find("https://voltag.ru") == 0:
-        reader_url_saved_text(url)  # сохраняем новую страницу
-        soup = read_text()  # делаем суп
-        save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup),
-                           filter_primenomost(soup))
+        if model_osnova == None:
+            reader_url_saved_text(url)  # сохраняем новую страницу
+            soup = read_text()  # делаем суп
+            save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup),
+                               filter_primenomost(soup))
+        else:
+            reader_url_saved_text(url)  # сохраняем новую страницу
+            soup = read_text()  # делаем суп
+            save_dannix_detali(model_osnova, filter_harakteristika(soup), filter_kross(soup),
+                               filter_primenomost(soup),filter_model(soup))
     else:
         soup = read_text()  # делаем суп
         save_dannix_detali(filter_model(soup), filter_harakteristika(soup), filter_kross(soup),
                            filter_primenomost(soup))
-
+    return filter_model(soup)
 
 
 # #Запись данных в файл формата json
@@ -172,7 +180,15 @@ def sup_save(url):
 
 #in_components(soup)
 if __name__ == '__main__':
-    url_detali = input(f"Введите адрес страница с сата voltag.ru или просто Enter \n")
-    sup_save(url_detali)
-
+#    url_detali = input(f"Введите адрес страница с сата voltag.ru или просто Enter \n")
+#    url_detali = 'https://voltag.ru/catalog/group/voltag_ala0879_generator/?q=ala0879'
+#    url_detali = 'https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610'
+    url_detali = 'https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236'
+    model_osnovnaya = sup_save(url_detali)
+#    sup_save("https://voltag.ru/catalog/group/voltag_ala0879_generator/?q=ala0879")
+    soup = componenty_detali.reader_url_component(f"https://voltag.ru/components/list/p-1/?q={model_osnovnaya}")
+    spisok_componentov_full = componenty_detali.perebor_pages_component(soup)
+    componenty_detali.save_components(model_osnovnaya , spisok_componentov_full)
+    for keys, values in spisok_componentov_full.items():
+        model_comp = sup_save(values[1], model_osnovnaya)
     print('Готово')
