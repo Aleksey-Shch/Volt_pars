@@ -35,10 +35,6 @@ def read_text():
     except Exception as err:
         print(f"Ошибка чтения из файла. Ошибка {err}")
 
-def in_components(soup):
-    if (soup.find('span', class_='ninf-cl').text) == "все":
-        return "Есть"
-
 # фильтрация названия модели
 def filter_model(soup):
     model = ''.join(soup.find('div', class_='catalog_group_title').text.split())
@@ -95,17 +91,17 @@ def save_dannix_detali(model, haratkeristika, cross, primenimost, list='model'):
             excel_file = openpyxl.load_workbook(f'{model}.xlsx')
             shet_names = excel_file.sheetnames
             if list in shet_names:  # проверияем существует ли лист с такой деталью
-                print(f'Есть такой лист. Сохранено как {list}new')
-                excel_sheet = excel_file.create_sheet(title=(f'{list}NEW'))
+                print(f'Есть такой лист. Не сохранено')
+                #excel_sheet = excel_file.create_sheet(title=(f'{list}NEW'))
                 #excel_sheet = excel_file[model]
+                excel_file.save(f'{model}.xlsx')
+                return
             else:
-                #print('No')
                 excel_sheet = excel_file.create_sheet(title=list)
         else:  # Иначе открываем пустой и формуем лист
             excel_file = openpyxl.Workbook()
             excel_sheet = excel_file.active
             excel_sheet.title = list
-            #excel_sheet = excel_file.create_sheet(title=model) # новая страница, имя model
 
         # Установки ширины столбцов
         excel_sheet.column_dimensions["A"].width = 5

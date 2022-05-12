@@ -48,18 +48,15 @@ def saved_component_ctranica(soup):
 def perebor_pages_component(soup):
     res, res_temp = {}, {}
     if soup.find('div', class_='page_number_outer'):
-        print(f"Много листов ")
+        #print(f"Много листов ")
         res_temp=res.copy()
         res = {**res_temp, **(saved_component_ctranica(soup))}
         for s in soup.find('div', {'id': 'page_navigation'}).find_all('a'):
             # print(f"Много листов - {stranica}")
             soup_list = reader_url_component(f'https://voltag.ru{s.get("href")}')
-            # тут надо сделать чтение всей станицы в файл
             res_temp = res.copy()
             res = {**res_temp, **(saved_component_ctranica(soup_list))}
     else:
-        # тут надо сделать чтение всей станицы в файл
-        # print(f"Один листов - {stranica}")
         res_temp = res.copy()
         res = {**res_temp, **(saved_component_ctranica(soup))}
     return res
@@ -70,9 +67,11 @@ def save_components(model, spisok):  #, haratkeristika, cross, primenimost):
             excel_file = openpyxl.load_workbook(f'{model}.xlsx')
             shet_names = excel_file.sheetnames
             if (f'{model}_компонент') in shet_names:  # проверияем существует ли лист с такой деталью
-                print(f'Есть такой лист. Сохранено как {model}new')
-                excel_sheet = excel_file.create_sheet(title=(f'{model}_компонент1'))
+                print(f'Есть такой лист. Данные не сохранены')
+                #excel_sheet = excel_file.create_sheet(title=(f'{model}_компонент1'))
                 #excel_sheet = excel_file[model]
+                excel_file.save(f'{model}.xlsx')
+                return
             else:
                 #print('No')
                 excel_sheet = excel_file.create_sheet(title=(f'{model}_компонент'))
