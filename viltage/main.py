@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import openpyxl
 import componenty_detali
-
+import time
 
 # чтение данных с сайта и сохранение в файле index.html
 def reader_url_saved_text(url):
@@ -79,10 +79,13 @@ def filter_kross(soup):
 
 # фильтраци данных применимости
 def filter_primenomost(soup):
-    quotes_primenimost = soup.find('div', class_='catalog_group_application_info')
-    # форматирование данных применимости primenimost
-    primenimost = [[x.replace('\t', ' ')] for x in quotes_primenimost.text.split('\n')]
-    return primenimost
+    try:
+        quotes_primenimost = soup.find('div', class_='catalog_group_application_info')
+        # форматирование данных применимости primenimost
+        primenimost = [[x.replace('\t', ' ')] for x in quotes_primenimost.text.split('\n')]
+        return primenimost
+    except:
+        return ['Нет данных']
 
 # запись данных в файл
 def save_dannix_detali(model, haratkeristika, cross, primenimost, list='model'):
@@ -169,13 +172,15 @@ def sup_save(url, model_osnova=None):
 if __name__ == '__main__':
 #    url_detali = input(f"Введите адрес страница с сата voltag.ru или просто Enter \n")
 #    url_detali = 'https://voltag.ru/catalog/group/voltag_ala0879_generator/?q=ala0879'
-#    url_detali = 'https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610'
-    url_detali = 'https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236'
+    url_detali = 'https://voltag.ru/catalog/list/voltag_ala2610_generator/?q=ala2610'
+#    url_detali = 'https://voltag.ru/catalog/group/voltag_ala0236_generator/?q=ALA0236'
     model_osnovnaya = sup_save(url_detali)
 #    sup_save("https://voltag.ru/catalog/group/voltag_ala0879_generator/?q=ala0879")
     soup = componenty_detali.reader_url_component(f"https://voltag.ru/components/list/p-1/?q={model_osnovnaya}")
     spisok_componentov_full = componenty_detali.perebor_pages_component(soup)
     componenty_detali.save_components(model_osnovnaya , spisok_componentov_full)
     for keys, values in spisok_componentov_full.items():
+        print(f'Чтение и сохранение компонета: {values[0]} - {keys}.')
+        time.sleep(15)
         model_comp = sup_save(values[1], model_osnovnaya)
     print('Готово')

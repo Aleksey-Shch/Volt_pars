@@ -17,9 +17,10 @@ def reader_url_component(url):
         }
         reg = requests.get(url, headers=headers)
         text_html = reg.text
+        return BeautifulSoup(text_html, "lxml")
     except Exception:
         print(f"Ошибка при чтении страницы {url}")
-    return BeautifulSoup(text_html, "lxml")
+
 
 # поиск всех компонентов на странице с их ссылками
 def saved_component_ctranica(soup):
@@ -61,7 +62,6 @@ def perebor_pages_component(soup):
         # print(f"Один листов - {stranica}")
         res_temp = res.copy()
         res = {**res_temp, **(saved_component_ctranica(soup))}
-        print('Все!')
     return res
 
 def save_components(model, spisok):  #, haratkeristika, cross, primenimost):
@@ -86,7 +86,7 @@ def save_components(model, spisok):  #, haratkeristika, cross, primenimost):
 
         stroka = 3
         for keys, values in spisok.items():
-            print(f'{keys} - {values}')
+            #print(f'{keys} - {values}')
             excel_sheet.cell(row=stroka, column=1).value = keys
             excel_sheet.cell(row=stroka, column=2).value = values[0]
             excel_sheet.cell(row=stroka, column=3).value = values[1]
